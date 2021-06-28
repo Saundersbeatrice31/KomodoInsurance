@@ -40,29 +40,32 @@ namespace KomodoInsuranceDeveloper
         {
             //find the developer team
             //Developers develop,
-            Developers existingDeveloperTeam = GetDeveloperByTeamUniqueId(uniqueId);
+            //Developers existingDeveloperTeam = GetDeveloperByTeamUniqueId(uniqueId);
             DevTeams getteamid = GetTeamById(uniqueId);
 
             if (getteamid != null)
             {
                 getteamid.TeamName = test.TeamName;
                 getteamid.TeamMembers = test.TeamMembers;
+                return true;
             }
             return false;            
         }
         //Delete
-        public bool RemoveDeveloperFromTeamsList(int uniqueId)
+        public bool RemoveDeveloperFromTeamsList(int uniqueId, int TeamId)
         {
             Developers develop = GetDeveloperByTeamUniqueId(uniqueId);
+            DevTeams devTeams = GetTeamById(TeamId);
 
             if (develop == null)
             {
                 return false;
             }
-            int initialCount = _listOfDevelopers.Count;
-            _listOfDevelopers.Remove(develop);
+            int initialCount = devTeams.TeamMembers.Count;
+            devTeams.TeamMembers.Remove(develop);
+            
 
-            if (initialCount > _listOfDevelopers.Count)
+            if (initialCount > devTeams.TeamMembers.Count)
             {
                 return true;
             }
@@ -70,6 +73,26 @@ namespace KomodoInsuranceDeveloper
             {
                 return false;
             }
+        }
+        public bool RemoveDeveloperTeam(int uniqueTeamId)
+        {
+            DevTeams TeamToRemove = GetTeamById(uniqueTeamId);
+            if (TeamToRemove == null)
+            {
+                return false;
+            }
+            int InitialCount = _listOfDeveloperTeams.Count;
+            _listOfDeveloperTeams.Remove(TeamToRemove);
+            if (InitialCount > _listOfDeveloperTeams.Count)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+            
         }
         //helper Method
         public Developers GetDeveloperByTeamUniqueId(int uniqueId)

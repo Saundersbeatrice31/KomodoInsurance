@@ -16,6 +16,7 @@ namespace KomodoInsuranceUI
         {
             //putting in seed Data
             SeedDeveloperList();
+            SeedDeveloperTeams();
             DisplayMenu();
         }
         //Menu
@@ -25,8 +26,10 @@ namespace KomodoInsuranceUI
             while (keepRunning)
             {
                 //Display the Options for the Managers
-                Console.WriteLine("Please select an option:\n" + "1.Add Developer\n" + "2.Add a developer Team\n" + "3.Add developer to Team\n" + "4.View list of all developers\n" + "5.View List of all developer Teams\n" + "6.View developer by Unique ID\n" + "7.Update list of developers\n" + "" + "8.Update List of Developer Teams\n" + "9.Remove developer from list\n" + "10.Remove developer from team\n" +
-                    "11.Exit.\n");
+                Console.WriteLine("Please select an option:\n" + "1.Add Developer\n" + "2.Add a developer Team\n" + "3.Add developer to Team\n" + "4.View list of all developers\n" + "5.View List of all developer Teams\n" + "6.View developer by Unique ID\n" + "7.Update list of developers\n" + "" + "8.Update List of Developers\n" +
+                    "9. Update Developer Teams.\n" + "10.Remove developer from list\n" + "11.Remove developer from team\n" +
+                    "12 Remove Team\n" +
+                    "13.Exit.\n");
                 //Get the managers input
                 string input = Console.ReadLine();
 
@@ -59,28 +62,36 @@ namespace KomodoInsuranceUI
                         AddingNewDevelopersByUniqueID();
                         break;
                     case "7":
+                        //Add Developer Teams
+                        AddDeveloperTeams();
+                        break;
+                    case "8":
                         //update list of developers
                         UpdateExistingDevelopersList();
                         break;
-                    case "8":
+                    case "9":
                         //update list of developer Teams
                         UpdateExistingDeveloperTeams();
                         break;
-                    case "9":
+                    case "10":
                         //remove developer from list
                         RemoveExistingDeveloper();
                         break;
-                    case "10":
+                    case "11":
                         //Remove developer from team
                         RemoveDeveloperFromTeam();
                         break;
-                    case "11":
+                    case "12":
+                        //Remove Developer Team
+                        RemoveDeveloperTeam();
+                        break;
+                    case "13":
                         //Exit menu
                         Console.WriteLine("GoodBye!");
                         keepRunning = false;
                         break;
                     default:
-                        Console.WriteLine("Please enter a valid number between 1 and 6.");
+                        Console.WriteLine("Please enter a valid number between 1 and 13.");
                         break;
                 }
                 Console.WriteLine("Please press any key to continue...");
@@ -129,19 +140,18 @@ namespace KomodoInsuranceUI
         }
         private void AddDeveloperToDevTeams()
         {
-            Console.Clear();
-            //AddDeveloperToDevTeams();
+            Console.Clear();            
             DisplayAllDeveloperTeams();
             DisplayAllDevelopers();
             DevTeams newDevTeams = new DevTeams();
             //DevName
             Console.WriteLine("What team do you want to add them to?");
             int teamid = int.Parse(Console.ReadLine());
-            List<Developers> testing = _developerRepo.GetDevelopersList();
+            List<Developers> devList = _developerRepo.GetDevelopersList();
             Console.WriteLine("What is the name of the Dev you want to add?");
             string userinput = Console.ReadLine();
             Developers newdev = new Developers();
-            foreach (var item in testing)
+            foreach (var item in devList)
             {
                 if (item.DevName == userinput)
                 {
@@ -153,7 +163,7 @@ namespace KomodoInsuranceUI
         //View current list of Developers
         private void DisplayAllDevelopers()
         {
-            Console.Clear();
+            //Console.Clear();
 
             List<Developers> ListOfDevelopers = _developerRepo.GetDevelopersList();
             //loop through Contents
@@ -170,14 +180,16 @@ namespace KomodoInsuranceUI
             List<DevTeams> ListOfDeveloperTeams = _developerTeamRepo.GetDevelopersTeamsList();
             foreach (DevTeams ListOfTeams in ListOfDeveloperTeams)
             {
-                Console.WriteLine(ListOfTeams.TeamName);
-            }
-            Console.ReadLine();
+                Console.WriteLine(ListOfTeams.TeamName + "\n" +
+                    ListOfTeams.TeamId);
+                    
+            }            
         }
         //view existing developers by Unique ID
         private void AddingNewDevelopersByUniqueID()
         {
             Console.Clear();
+            DisplayAllDevelopers();
             //Prompt the manager to give a Unique Id
             Console.WriteLine("Please enter the Unique ID number of the developer you would like to see:");
             //Get manager input
@@ -233,16 +245,16 @@ namespace KomodoInsuranceUI
         private void UpdateExistingDeveloperTeams()
         {
             Console.Clear();
-
             DisplayAllDeveloperTeams();
             //Ask manager for the ID number they want to update
+            Console.WriteLine("Please enter the developer Team you would like to update:");
+            string TeamName = Console.ReadLine();
             Console.WriteLine("Please enter the ID number of the developer team  you would like to update:");
             //Get the ID number
             string existingTeamId = Console.ReadLine();
             int UniqueId = int.Parse(existingTeamId);
 
-            var currenteam = _developerTeamRepo.GetTeamById(UniqueId);
-
+            var currenteam = _developerTeamRepo.GetTeamById(UniqueId);            
             Console.WriteLine("Please enter the developers name you want to update:");
             string userinput = Console.ReadLine();
             foreach (var item in currenteam.TeamMembers)
@@ -284,12 +296,32 @@ namespace KomodoInsuranceUI
             DisplayAllDevelopers();
             DisplayAllDeveloperTeams();
             //Get developer you want to delete from team
+            Console.WriteLine("\n Please enter the TeamId of the Team you want to remove a developer from:");
+            int Ids = int.Parse(Console.ReadLine());
             Console.WriteLine("\n Please enter the ID number of the developer you want to remove from the team:");
             int Id = int.Parse(Console.ReadLine());
 
-            //call teh delete method
-            bool wasRemoved = _developerRepo.RemoveDeveloperFromList(Id);
+            //call the delete method
+            bool wasRemoved = _developerTeamRepo.RemoveDeveloperFromTeamsList(Id,Ids);
             if (wasRemoved)
+            {
+                Console.WriteLine("The Developer Team was succesfully removed from the team.");
+            }
+            else
+            {
+                Console.WriteLine("The Developer Team could not be removed.");
+            }
+        }
+        public void RemoveDeveloperTeam()
+        {
+            DisplayAllDevelopers();
+            DisplayAllDeveloperTeams();
+            Console.WriteLine("\n Please enter the ID of the Team you want to remove:");
+            int Id = int.Parse(Console.ReadLine());
+            //call the delete method
+
+            bool wasDeleted = _developerTeamRepo.RemoveDeveloperTeam(Id);
+            if (wasDeleted)
             {
                 Console.WriteLine("The Developer Team was succesfully removed.");
             }
@@ -310,6 +342,21 @@ namespace KomodoInsuranceUI
             _developerRepo.AddDeveloperToList(test2);
             _developerRepo.AddDeveloperToList(test3);
             _developerRepo.AddDeveloperToList(test1);
+        }
+        private void SeedDeveloperTeams()
+        {
+            DevTeams test = new DevTeams("Awesomes", 5698);
+            DevTeams test11 = new DevTeams("Awesomes", 5698);
+            DevTeams test22 = new DevTeams("Awesomes", 5698);
+            DevTeams test33 = new DevTeams("Awesomes", 5698);
+
+            _developerTeamRepo.AddDeveloperTeams(test);
+            _developerTeamRepo.AddDeveloperTeams(test11);
+            _developerTeamRepo.AddDeveloperTeams(test22);
+            _developerTeamRepo.AddDeveloperTeams(test33);
+           
+
+
         }
     }
 }

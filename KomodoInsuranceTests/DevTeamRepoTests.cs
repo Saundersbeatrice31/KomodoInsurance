@@ -64,7 +64,7 @@ namespace KomodoInsuranceTests
         {
             //Arrange
             //Act
-            bool removeResult = _repo.RemoveDeveloperFromTeamsList(_content.TeamId);
+            bool removeResult = _repo.RemoveDeveloperTeam(_content.TeamId);
             //Assert
             Assert.IsTrue(removeResult);
 

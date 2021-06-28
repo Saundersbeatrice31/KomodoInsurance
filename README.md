@@ -1,0 +1,1 @@
+# KomodoInsurance This application is made for the insurance company Komodo Insurance. It is used by the managers to make changes to thier developers and developer teams. It is user friendly and easy to use. 
